@@ -3,6 +3,7 @@ namespace SocialAuth\Auth;
 
 use SocialAuth\User\UserManager;
 use SocialAuth\Security\RateLimiter;
+use SocialAuth\Database\DbManager;
 use SocialAuth\Helpers\Logger;
 
 class AuthManager {
@@ -106,6 +107,9 @@ class AuthManager {
         wp_set_auth_cookie( $wp_user->ID, true );
         do_action( 'wp_login', $wp_user->user_login, $wp_user );
         do_action( 'socialauth_login_success', $wp_user->ID, $provider_id );
+
+        // Audit log.
+        DbManager::log( $wp_user->ID, $provider_id, 'login' );
 
         $redirect = apply_filters( 'socialauth_login_redirect', admin_url(), $wp_user );
         wp_redirect( $redirect );

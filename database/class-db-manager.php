@@ -15,7 +15,6 @@ class DbManager {
         $charset = $wpdb->get_charset_collate();
         $prefix  = $wpdb->prefix;
 
-        // Social accounts linking table.
         $sql_accounts = "CREATE TABLE IF NOT EXISTS {$prefix}socialauth_accounts (
             id            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             user_id       BIGINT(20) UNSIGNED NOT NULL,
@@ -34,7 +33,6 @@ class DbManager {
             KEY          email (email)
         ) {$charset};";
 
-        // Audit / activity log table.
         $sql_log = "CREATE TABLE IF NOT EXISTS {$prefix}socialauth_log (
             id         BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             user_id    BIGINT(20) UNSIGNED DEFAULT NULL,
@@ -53,6 +51,25 @@ class DbManager {
         dbDelta( $sql_log );
 
         update_option( self::TABLE_VERSION_OPTION, self::CURRENT_VERSION );
+    }
+
+    /**
+     * Log an audit event to the socialauth_log table.
+     */
+    public static function log( int $user_id, string $provider, string $action ): void {
+        global $wpdb;
+
+        $wpdb->insert(
+            $wpdb->prefix . 'socialauth_log',
+            [
+                'user_id'    => $user_id,
+                'provider'   => $provider,
+                'action'     => $action,
+                'ip_address' => filter_var( $_SERVER['REMOTE_ADDR'] ?? '', FILTER_VALIDATE_IP ) ?: null,
+                'user_agent' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 0, 500 ) : null,
+            ],
+            [ '%d', '%s', '%s', '%s', '%s' ]
+        );
     }
 
     /**

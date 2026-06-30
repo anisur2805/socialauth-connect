@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name:       SocialAuth Connect
- * Plugin URI:        https://yoursite.com/socialauth-connect
+ * Plugin URI:        https://github.com/anisur2805/socialauth-connect
  * Description:       Modular social authentication with Google OAuth2/OIDC. Extensible to Facebook, X, Email, and more.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
- * Author:            Your Name
+ * Author:            Anisur Rahman
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       socialauth-connect

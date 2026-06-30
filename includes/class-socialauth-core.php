@@ -24,6 +24,7 @@ class Core {
     }
 
     public function run(): void {
+        I18n::load();
         $this->register_providers();
         $this->init_hooks();
     }
@@ -38,6 +39,10 @@ class Core {
     }
 
     private function init_hooks(): void {
+        // Enqueue assets.
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
+
         // Auth flow.
         $auth = new AuthManager( $this->providers );
         $auth->register_hooks();
@@ -69,5 +74,33 @@ class Core {
 
     public function get_providers(): array {
         return $this->providers;
+    }
+
+    /**
+     * Enqueue public-facing CSS.
+     */
+    public function enqueue_assets(): void {
+        wp_enqueue_style(
+            'socialauth-public',
+            SOCIALAUTH_PLUGIN_URL . 'assets/css/socialauth-public.css',
+            [],
+            SOCIALAUTH_VERSION
+        );
+    }
+
+    /**
+     * Enqueue admin CSS on our settings page only.
+     */
+    public function enqueue_admin_assets( string $hook ): void {
+        if ( false === strpos( $hook, 'socialauth-connect' ) ) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'socialauth-admin',
+            SOCIALAUTH_PLUGIN_URL . 'assets/css/socialauth-admin.css',
+            [],
+            SOCIALAUTH_VERSION
+        );
     }
 }
