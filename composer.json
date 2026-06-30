@@ -13,17 +13,26 @@
         "squizlabs/php_codesniffer": "^3.7"
     },
     "autoload": {
-        "psr-4": {
-            "SocialAuth\\": "includes/"
-        },
+        "classmap": [
+            "includes/abstracts/",
+            "includes/interfaces/",
+            "includes/providers/",
+            "includes/auth/",
+            "includes/user/",
+            "includes/admin/",
+            "includes/frontend/",
+            "includes/security/",
+            "includes/helpers/",
+            "includes/"
+        ],
         "files": [
             "includes/helpers/functions.php"
         ]
     },
     "autoload-dev": {
-        "psr-4": {
-            "SocialAuth\\Tests\\": "tests/"
-        }
+        "classmap": [
+            "tests/"
+        ]
     },
     "scripts": {
         "phpcs": "phpcs --standard=WordPress includes/",
