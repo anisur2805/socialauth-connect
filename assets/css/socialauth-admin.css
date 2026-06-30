@@ -1,0 +1,30 @@
+.socialauth-admin-wrap .nav-tab-wrapper {
+    margin-bottom: 20px;
+}
+
+.socialauth-admin-wrap .form-table th {
+    width: 200px;
+}
+
+.socialauth-admin-wrap .description {
+    color: #666;
+    font-style: italic;
+}
+
+.socialauth-admin-wrap .socialauth-provider-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.socialauth-admin-wrap .socialauth-provider-status.enabled {
+    background: #d4edda;
+    color: #155724;
+}
+
+.socialauth-admin-wrap .socialauth-provider-status.disabled {
+    background: #f8d7da;
+    color: #721c24;
+}
