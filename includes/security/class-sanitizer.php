@@ -27,12 +27,12 @@ class Sanitizer {
     /**
      * Sanitize an array of mixed data recursively.
      */
-    public static function array( array $input ): array {
+    public static function sanitize_array( array $input ): array {
         $clean = [];
         foreach ( $input as $key => $value ) {
             $key = sanitize_key( $key );
             if ( is_array( $value ) ) {
-                $clean[ $key ] = self::array( $value );
+                $clean[ $key ] = self::sanitize_array( $value );
             } elseif ( is_string( $value ) ) {
                 $clean[ $key ] = sanitize_text_field( $value );
             } else {

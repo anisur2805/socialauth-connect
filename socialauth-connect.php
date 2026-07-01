@@ -32,11 +32,8 @@ register_activation_hook( __FILE__, [ 'SocialAuth\Activator', 'activate' ] );
 register_deactivation_hook( __FILE__, [ 'SocialAuth\Deactivator', 'deactivate' ] );
 
 // Bootstrap
-require_once SOCIALAUTH_PLUGIN_DIR . 'includes/class-socialauth-core.php';
-
 function socialauth_run(): void {
-    $plugin = new \SocialAuth\Core();
-    $plugin->run();
+    \SocialAuth\Core::instance()->run();
 }
 
 socialauth_run();

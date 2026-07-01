@@ -29,7 +29,7 @@ class HttpClient {
             'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ],
-            'body'    => wp_json_encode( $data ),
+            'body'    => http_build_query( $data ),
         ];
 
         // Override body encoding if already encoded.

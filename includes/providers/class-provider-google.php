@@ -58,15 +58,4 @@ class Google extends AbstractOAuth2Provider {
         ];
     }
 
-    /**
-     * Override: Google supports ID token (JWT) — add nonce for OIDC replay prevention.
-     */
-    public function get_auth_url(): string {
-        $url = parent::get_auth_url();
-
-        // Add nonce for OIDC replay attack prevention.
-        $nonce = wp_create_nonce( 'socialauth_google_nonce' );
-
-        return add_query_arg( [ 'nonce' => $nonce ], $url );
-    }
 }

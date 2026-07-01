@@ -23,7 +23,8 @@
             "includes/frontend/",
             "includes/security/",
             "includes/helpers/",
-            "includes/"
+            "includes/",
+            "database/"
         ],
         "files": [
             "includes/helpers/functions.php"

@@ -18,8 +18,8 @@ class AuthManager {
      * Register all WordPress hooks for OAuth flow.
      */
     public function register_hooks(): void {
-        add_action( 'init', [ $this, 'handle_callback' ] );
-        add_action( 'init', [ $this, 'handle_redirect' ] );
+        add_action( 'template_redirect', [ $this, 'handle_callback' ] );
+        add_action( 'template_redirect', [ $this, 'handle_redirect' ] );
     }
 
     /**
@@ -30,7 +30,7 @@ class AuthManager {
             return;
         }
 
-        if ( $_GET['socialauth_action'] !== 'login' ) {
+        if ( 'login' !== $_GET['socialauth_action'] ) {
             return;
         }
 
@@ -58,7 +58,7 @@ class AuthManager {
             return;
         }
 
-        if ( $_GET['socialauth_action'] !== 'callback' ) {
+        if ( 'callback' !== $_GET['socialauth_action'] ) {
             return;
         }
 
@@ -69,6 +69,24 @@ class AuthManager {
             wp_die( esc_html__( 'Invalid provider.', 'socialauth-connect' ), 400 );
         }
 
+        // Rate limiting on callback.
+        if ( ! RateLimiter::check( 'callback_' . $provider_id ) ) {
+            wp_die( esc_html__( 'Too many authentication attempts. Please wait.', 'socialauth-connect' ), 429 );
+        }
+
+        // Check for error from provider BEFORE consuming state.
+        if ( isset( $_GET['error'] ) ) {
+            $error = sanitize_text_field( $_GET['error'] );
+            Logger::warning( 'Provider returned error', [ 'provider' => $provider_id, 'error' => $error ] );
+
+            // Validate state even on error to prevent state manipulation.
+            $state = sanitize_text_field( $_GET['state'] ?? '' );
+            StateManager::validate( $state, $provider_id );
+
+            wp_redirect( add_query_arg( 'socialauth_error', urlencode( $error ), wp_login_url() ) );
+            exit;
+        }
+
         // Validate CSRF state.
         $state = sanitize_text_field( $_GET['state'] ?? '' );
         if ( ! StateManager::validate( $state, $provider_id ) ) {
@@ -76,24 +94,39 @@ class AuthManager {
             wp_die( esc_html__( 'Invalid authentication state. Please try again.', 'socialauth-connect' ), 403 );
         }
 
-        // Check for error from provider.
-        if ( isset( $_GET['error'] ) ) {
-            $error = sanitize_text_field( $_GET['error'] );
-            Logger::warning( 'Provider returned error', [ 'provider' => $provider_id, 'error' => $error ] );
-            wp_redirect( add_query_arg( 'socialauth_error', urlencode( $error ), wp_login_url() ) );
-            exit;
+        $code = sanitize_text_field( $_GET['code'] ?? '' );
+        if ( empty( $code ) ) {
+            wp_die( esc_html__( 'Missing authorization code.', 'socialauth-connect' ), 400 );
         }
 
-        $code   = sanitize_text_field( $_GET['code'] ?? '' );
         $tokens = $provider->exchange_code_for_token( $code );
 
         if ( empty( $tokens['access_token'] ) ) {
+            Logger::error( 'Token exchange failed', [ 'provider' => $provider_id ] );
             wp_die( esc_html__( 'Failed to retrieve access token.', 'socialauth-connect' ), 500 );
         }
 
         $raw_profile = $provider->get_user_profile( $tokens['access_token'] );
+
+        if ( empty( $raw_profile ) ) {
+            Logger::error( 'Profile fetch failed', [ 'provider' => $provider_id ] );
+            wp_redirect( add_query_arg( 'socialauth_error', 'profile_fetch_failed', wp_login_url() ) );
+            exit;
+        }
+
         $social_user = $provider->normalize_user( $raw_profile );
-        $wp_user     = UserManager::authenticate( $social_user );
+
+        /** This filter is documented in plan.md */
+        $social_user = apply_filters( 'socialauth_normalize_user', $social_user, $provider_id );
+
+        // Check email verification before account linking (C-5).
+        if ( ! empty( $social_user['email'] ) && empty( $social_user['verified'] ) ) {
+            Logger::warning( 'Unverified email rejected', [ 'provider' => $provider_id, 'email' => $social_user['email'] ] );
+            wp_redirect( add_query_arg( 'socialauth_error', 'email_not_verified', wp_login_url() ) );
+            exit;
+        }
+
+        $wp_user = UserManager::authenticate( $social_user );
 
         if ( ! $wp_user ) {
             wp_redirect( add_query_arg( 'socialauth_error', 'registration_disabled', wp_login_url() ) );
@@ -111,8 +144,16 @@ class AuthManager {
         // Audit log.
         DbManager::log( $wp_user->ID, $provider_id, 'login' );
 
-        $redirect = apply_filters( 'socialauth_login_redirect', admin_url(), $wp_user );
-        wp_redirect( $redirect );
+        // Redirect with validation and shortcode redirect support.
+        $redirect = admin_url();
+
+        // Support shortcode redirect attribute.
+        if ( ! empty( $_GET['socialauth_redirect'] ) ) {
+            $redirect = wp_validate_redirect( sanitize_url( wp_unslash( $_GET['socialauth_redirect'] ) ), admin_url() );
+        }
+
+        $redirect = apply_filters( 'socialauth_login_redirect', $redirect, $wp_user );
+        wp_redirect( wp_validate_redirect( $redirect, admin_url() ) );
         exit;
     }
 

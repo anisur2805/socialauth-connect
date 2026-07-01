@@ -16,8 +16,8 @@ class UserManager {
             return $wp_user;
         }
 
-        // 2. Try to find by matching email.
-        if ( ! empty( $social_user['email'] ) ) {
+        // 2. Try to find by matching email (only if verified).
+        if ( ! empty( $social_user['email'] ) && ! empty( $social_user['verified'] ) ) {
             $wp_user = get_user_by( 'email', $social_user['email'] );
             if ( $wp_user ) {
                 // Link the social account to existing user.
@@ -96,9 +96,20 @@ class UserManager {
     public static function link_provider( int $user_id, array $social_user ): void {
         $provider = $social_user['provider'];
 
-        update_user_meta( $user_id, '_socialauth_provider', $provider );
+        // Store linked providers as array so multiple providers work.
+        $linked = (array) get_user_meta( $user_id, '_socialauth_linked_providers', true );
+        if ( ! in_array( $provider, $linked, true ) ) {
+            $linked[] = $provider;
+        }
+        update_user_meta( $user_id, '_socialauth_linked_providers', $linked );
+
         update_user_meta( $user_id, '_socialauth_provider_id_' . $provider, $social_user['provider_id'] );
-        update_user_meta( $user_id, '_socialauth_profile_' . $provider, $social_user );
+
+        // Whitelist keys before storage to prevent injection via filters.
+        $allowed = array_intersect_key( $social_user, array_flip( [
+            'provider', 'provider_id', 'email', 'name', 'first_name', 'last_name', 'avatar_url', 'verified', 'locale',
+        ] ) );
+        update_user_meta( $user_id, '_socialauth_profile_' . $provider, $allowed );
         update_user_meta( $user_id, '_socialauth_linked_at_' . $provider, current_time( 'mysql' ) );
 
         do_action( 'socialauth_provider_linked', $user_id, $provider, $social_user );
