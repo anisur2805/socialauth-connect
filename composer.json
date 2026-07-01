@@ -38,5 +38,10 @@
         "phpcs": "phpcs --standard=WordPress includes/",
         "phpcbf": "phpcbf --standard=WordPress includes/",
         "test": "phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
