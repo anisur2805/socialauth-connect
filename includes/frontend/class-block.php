@@ -1,7 +1,7 @@
 <?php
-defined( 'ABSPATH' ) || exit;
 namespace SocialAuth\Frontend;
 
+defined( 'ABSPATH' ) || exit;
 /**
  * Gutenberg block registration (Phase 3).
  * Placeholder for now.

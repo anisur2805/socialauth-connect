@@ -1,6 +1,8 @@
 <?php
 namespace SocialAuth\Admin;
 
+defined( 'ABSPATH' ) || exit;
+
 class AdminSettings {
 
 	public function register_hooks(): void {
@@ -186,8 +188,8 @@ class AdminSettings {
 	}
 
 	public function render_google_section_description(): void {
-		/* translators: %1$s = link to Google Cloud Console, %2$s = redirect URI code */
 		echo '<p>' . sprintf(
+			/* translators: %1$s = link to Google Cloud Console, %2$s = redirect URI code */
 			esc_html__( 'Create credentials at %1$s. Set the Authorized redirect URI to: %2$s', 'socialauth-connect' ),
 			'<a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a>',
 			'<code>' . esc_url(
@@ -203,8 +205,8 @@ class AdminSettings {
 	}
 
 	public function render_facebook_section_description(): void {
-		/* translators: %1$s = link to Facebook Developers, %2$s = redirect URI code */
 		echo '<p>' . sprintf(
+			/* translators: %1$s = link to Facebook Developers, %2$s = redirect URI code */
 			esc_html__( 'Create a Facebook App at %1$s. Set the Authorized redirect URI (Valid OAuth Redirect URIs) to: %2$s', 'socialauth-connect' ),
 			'<a href="https://developers.facebook.com/apps/" target="_blank">Facebook Developers</a>',
 			'<code>' . esc_url(

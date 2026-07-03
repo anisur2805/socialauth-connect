@@ -1,7 +1,7 @@
 <?php
-defined( 'ABSPATH' ) || exit;
 namespace SocialAuth\Admin;
 
+defined( 'ABSPATH' ) || exit;
 class AdminMenu {
 
 	public function register_hooks(): void {

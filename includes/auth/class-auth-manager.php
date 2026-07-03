@@ -1,7 +1,7 @@
 <?php
-defined( 'ABSPATH' ) || exit;
 namespace SocialAuth\Auth;
 
+defined( 'ABSPATH' ) || exit;
 use SocialAuth\User\UserManager;
 use SocialAuth\Security\RateLimiter;
 use SocialAuth\Database\DbManager;

@@ -1,7 +1,7 @@
 <?php
-defined( 'ABSPATH' ) || exit;
 namespace SocialAuth;
 
+defined( 'ABSPATH' ) || exit;
 use SocialAuth\Auth\AuthManager;
 use SocialAuth\Admin\AdminMenu;
 use SocialAuth\Admin\AdminSettings;

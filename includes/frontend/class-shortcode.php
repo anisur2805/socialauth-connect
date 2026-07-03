@@ -1,7 +1,7 @@
 <?php
-defined( 'ABSPATH' ) || exit;
 namespace SocialAuth\Frontend;
 
+defined( 'ABSPATH' ) || exit;
 class Shortcode {
 
 	private array $providers;
