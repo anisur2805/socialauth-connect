@@ -41,17 +41,19 @@ abstract class AbstractOAuth2Provider implements ProviderInterface {
     public function get_auth_url(): string {
         $state = StateManager::generate( $this->get_id() );
 
-        return add_query_arg(
-            [
-                'client_id'     => $this->client_id,
-                'redirect_uri'  => $this->redirect_uri,
-                'response_type' => 'code',
-                'scope'         => implode( ' ', $this->scopes ),
-                'state'         => $state,
-                'access_type'   => 'offline', // For refresh tokens where supported
-            ],
-            $this->auth_url
-        );
+        // http_build_query (RFC 3986) instead of add_query_arg: add_query_arg
+        // does not urlencode values, so the '&' inside redirect_uri would
+        // truncate it and cause a redirect_uri_mismatch at the provider.
+        $params = [
+            'client_id'     => $this->client_id,
+            'redirect_uri'  => $this->redirect_uri,
+            'response_type' => 'code',
+            'scope'         => implode( ' ', $this->scopes ),
+            'state'         => $state,
+            'access_type'   => 'offline', // For refresh tokens where supported
+        ];
+
+        return $this->auth_url . '?' . http_build_query( $params, '', '&', PHP_QUERY_RFC3986 );
     }
 
     /**

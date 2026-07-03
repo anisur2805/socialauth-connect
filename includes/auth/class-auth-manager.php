@@ -18,8 +18,10 @@ class AuthManager {
      * Register all WordPress hooks for OAuth flow.
      */
     public function register_hooks(): void {
-        add_action( 'template_redirect', [ $this, 'handle_callback' ] );
-        add_action( 'template_redirect', [ $this, 'handle_redirect' ] );
+        // 'init' fires on every request (front-end and wp-login.php),
+        // unlike 'template_redirect' which never runs on wp-login.php.
+        add_action( 'init', [ $this, 'handle_callback' ] );
+        add_action( 'init', [ $this, 'handle_redirect' ] );
     }
 
     /**
