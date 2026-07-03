@@ -5,7 +5,7 @@ use SocialAuth\Database\DbManager;
 
 class Activator {
 
-    public static function activate(): void {
-        DbManager::install();
-    }
+	public static function activate(): void {
+		DbManager::install();
+	}
 }
