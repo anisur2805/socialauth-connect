@@ -17,6 +17,11 @@ class Shortcode {
      * [socialauth_login providers="google" redirect="/dashboard" show_label="true"]
      */
     public function render( array $atts ): string {
+        // Only show buttons if user is NOT logged in.
+        if ( is_user_logged_in() ) {
+            return '';
+        }
+
         $atts = shortcode_atts( [
             'providers'   => 'google',
             'redirect'    => '',

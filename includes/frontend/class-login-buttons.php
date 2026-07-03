@@ -15,6 +15,11 @@ class LoginButtons {
     }
 
     public function render_login_buttons(): void {
+        // Only show buttons on login form when user is NOT logged in.
+        if ( is_user_logged_in() ) {
+            return;
+        }
+
         $enabled_providers = array_filter(
             $this->providers,
             fn( $p ) => $p->is_enabled()
