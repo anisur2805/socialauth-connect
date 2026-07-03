@@ -21,6 +21,10 @@ $active_tab = $active_tab ?? 'general';
            class="nav-tab <?php echo 'google' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Google', 'socialauth-connect' ); ?>
         </a>
+        <a href="?page=socialauth-connect&tab=facebook"
+           class="nav-tab <?php echo 'facebook' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e( 'Facebook', 'socialauth-connect' ); ?>
+        </a>
     </nav>
 
     <div class="tab-content" style="margin-top: 20px;">
@@ -29,6 +33,14 @@ $active_tab = $active_tab ?? 'general';
                 <?php
                 settings_fields( 'socialauth_google_settings' );
                 do_settings_sections( 'socialauth-google' );
+                submit_button();
+                ?>
+            </form>
+        <?php elseif ( 'facebook' === $active_tab ) : ?>
+            <form method="post" action="options.php">
+                <?php
+                settings_fields( 'socialauth_facebook_settings' );
+                do_settings_sections( 'socialauth-facebook' );
                 submit_button();
                 ?>
             </form>

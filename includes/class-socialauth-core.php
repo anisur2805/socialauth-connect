@@ -9,6 +9,7 @@ use SocialAuth\Frontend\LoginButtons;
 use SocialAuth\Frontend\Shortcode;
 use SocialAuth\Frontend\Block;
 use SocialAuth\Providers\Google;
+use SocialAuth\Providers\Facebook;
 
 class Core {
 
@@ -30,7 +31,8 @@ class Core {
     }
 
     private function register_providers(): void {
-        $this->providers['google'] = new Google();
+        $this->providers['google']   = new Google();
+        $this->providers['facebook'] = new Facebook();
 
         /**
          * Filter: register additional providers.

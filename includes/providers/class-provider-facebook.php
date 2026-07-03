@@ -2,12 +2,8 @@
 namespace SocialAuth\Providers;
 
 use SocialAuth\Abstracts\AbstractOAuth2Provider;
+use SocialAuth\Helpers\HttpClient;
 
-/**
- * Facebook OAuth2 provider (Phase 2 placeholder).
- *
- * @package SocialAuthConnect
- */
 class Facebook extends AbstractOAuth2Provider {
 
     protected string $auth_url  = 'https://www.facebook.com/v18.0/dialog/oauth';
@@ -27,12 +23,34 @@ class Facebook extends AbstractOAuth2Provider {
         return __( 'Facebook', 'socialauth-connect' );
     }
 
+    /**
+     * Fetch user info from Facebook Graph API.
+     */
     public function get_user_profile( string $access_token ): array {
-        // Phase 2: implement Graph API call.
-        return [];
+        $response = HttpClient::get(
+            $this->userinfo_url,
+            [
+                'fields' => 'id,email,name,first_name,last_name,picture.width(200)',
+            ],
+            [ 'Authorization' => 'Bearer ' . $access_token ]
+        );
+
+        if ( is_wp_error( $response ) || empty( $response ) ) {
+            return [];
+        }
+
+        return $response;
     }
 
+    /**
+     * Normalize Facebook profile to standard structure.
+     */
     public function normalize_user( array $raw ): array {
+        $avatar_url = '';
+        if ( ! empty( $raw['picture']['data']['url'] ) ) {
+            $avatar_url = esc_url_raw( $raw['picture']['data']['url'] );
+        }
+
         return [
             'provider'    => $this->get_id(),
             'provider_id' => sanitize_text_field( $raw['id']         ?? '' ),
@@ -40,8 +58,8 @@ class Facebook extends AbstractOAuth2Provider {
             'name'        => sanitize_text_field( $raw['name']      ?? '' ),
             'first_name'  => sanitize_text_field( $raw['first_name'] ?? '' ),
             'last_name'   => sanitize_text_field( $raw['last_name'] ?? '' ),
-            'avatar_url'  => '',
-            'verified'    => false,
+            'avatar_url'  => $avatar_url,
+            'verified'    => true, // Facebook requires email verification for OAuth
             'locale'      => '',
         ];
     }

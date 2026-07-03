@@ -23,7 +23,7 @@ Update this file whenever a feature lands or a bug is fixed.
 
 | Feature | Status |
 |---|---|
-| Facebook (Graph API OAuth2) | ⏳ Pipeline (placeholder class exists) |
+| Facebook (Graph API OAuth2) | ✅ Done (2026-07-03) |
 | X / Twitter (OAuth 2.0 PKCE) | ⏳ Pipeline (placeholder class exists) |
 | GitHub OAuth2 | ⏳ Pipeline |
 | Email Magic Link (passwordless) | ⏳ Pipeline |
@@ -42,6 +42,15 @@ Update this file whenever a feature lands or a bug is fixed.
 | PHPUnit test suite (`tests/` scaffolded, no tests yet) | ⏳ Pipeline |
 
 ## Fix Log
+
+### 2026-07-03 — Facebook OAuth2 integration complete
+- Implemented `get_user_profile()` to fetch from Facebook Graph API v18.0
+- Proper field mapping: id, email, name, first_name, last_name, picture (avatar)
+- `normalize_user()` handles Facebook's nested picture object format
+- Added admin settings panel with App ID / App Secret fields
+- Added Facebook tab to settings page with redirect URI instruction
+- Registered provider in Core.php; auto-enables when credentials provided
+- Ready for production: users can now "Continue with Facebook" on login page
 
 ### 2026-07-03 — Google login "can't proceed" fixed
 - **Root cause:** `get_auth_url()` built the Google authorization URL with
