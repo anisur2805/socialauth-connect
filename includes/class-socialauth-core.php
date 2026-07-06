@@ -106,5 +106,22 @@ class Core {
 			array(),
 			SOCIALAUTH_VERSION
 		);
+
+		wp_enqueue_script(
+			'socialauth-admin',
+			SOCIALAUTH_PLUGIN_URL . 'assets/js/socialauth-admin.js',
+			array(),
+			SOCIALAUTH_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'socialauth-admin',
+			'socialauthAdmin',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'socialauth_admin_nonce' ),
+			)
+		);
 	}
 }

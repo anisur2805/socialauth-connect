@@ -79,12 +79,16 @@ class AuthManager {
 
 		// Check for error from provider BEFORE consuming state.
 		if ( isset( $_GET['error'] ) ) {
-			$error = sanitize_text_field( $_GET['error'] );
+			$error      = sanitize_text_field( $_GET['error'] );
+			$desc       = sanitize_text_field( $_GET['error_description'] ?? '' );
+			$display    = $desc ? $desc : $error;
+
 			Logger::warning(
 				'Provider returned error',
 				array(
-					'provider' => $provider_id,
-					'error'    => $error,
+					'provider'    => $provider_id,
+					'error'       => $error,
+					'description' => $desc,
 				)
 			);
 
@@ -92,7 +96,15 @@ class AuthManager {
 			$state = sanitize_text_field( $_GET['state'] ?? '' );
 			StateManager::validate( $state, $provider_id );
 
-			wp_redirect( add_query_arg( 'socialauth_error', urlencode( $error ), wp_login_url() ) );
+			// Map common OAuth errors to user-friendly messages.
+			$user_message = $this->get_friendly_error( $error, $desc, $provider_id );
+
+			wp_redirect( add_query_arg(
+				array(
+					'socialauth_error' => urlencode( $user_message ),
+				),
+				wp_login_url()
+			) );
 			exit;
 		}
 
@@ -170,6 +182,35 @@ class AuthManager {
 		$redirect = apply_filters( 'socialauth_login_redirect', $redirect, $wp_user );
 		wp_redirect( wp_validate_redirect( $redirect, admin_url() ) );
 		exit;
+	}
+
+	/**
+	 * Map raw OAuth error codes to user-friendly messages.
+	 */
+	private function get_friendly_error( string $error, string $description, string $provider_id ): string {
+		$messages = array(
+			'access_denied'           => __( 'Login was cancelled. Please try again.', 'socialauth-connect' ),
+			'invalid_scope'           => __( 'Invalid permission scope requested.', 'socialauth-connect' ),
+			'server_error'            => __( 'Provider server error. Please try again later.', 'socialauth-connect' ),
+			'temporarily_unavailable' => __( 'Provider is temporarily unavailable. Please try again later.', 'socialauth-connect' ),
+			'redirect_uri_mismatch'   => __(
+				'Redirect URI mismatch. Check that your provider\'s OAuth Redirect URI matches exactly.',
+				'socialauth-connect'
+			),
+		);
+
+		if ( isset( $messages[ $error ] ) ) {
+			return $messages[ $error ];
+		}
+
+		// For unknown errors, return the description if available.
+		return $description
+			? $description
+			: sprintf(
+				/* translators: %s = raw error code */
+				__( 'Authentication failed: %s', 'socialauth-connect' ),
+				$error
+			);
 	}
 
 	public function get_provider( string $id ): ?object {
