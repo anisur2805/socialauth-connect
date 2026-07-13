@@ -152,6 +152,24 @@ $active_tab = $active_tab ?? 'general';
                             </p>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="socialauth_dashboard_widget">
+                                <?php esc_html_e( 'Dashboard Widget', 'socialauth-connect' ); ?>
+                            </label>
+                        </th>
+                        <td>
+                            <?php $widget_checked = get_option( 'socialauth_dashboard_widget', true ); ?>
+                            <input type="checkbox"
+                                   id="socialauth_dashboard_widget"
+                                   name="socialauth_dashboard_widget"
+                                   value="1"
+                                   <?php checked( $widget_checked ); ?> />
+                            <p class="description">
+                                <?php esc_html_e( 'Show social account info and logout button on the dashboard.', 'socialauth-connect' ); ?>
+                            </p>
+                        </td>
+                    </tr>
                 </table>
                 <?php submit_button(); ?>
             </form>

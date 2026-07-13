@@ -66,8 +66,8 @@ class UserManager {
 		$email    = sanitize_email( $social_user['email'] ?? '' );
 
 		if ( empty( $email ) ) {
-			Logger::warning( 'Cannot create user: no email from provider', $social_user );
-			return false;
+			// Generate a placeholder email so the user can still register.
+			$email = $username . '@socialauth.placeholder';
 		}
 
 		$user_id = wp_insert_user(

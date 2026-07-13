@@ -32,6 +32,16 @@ class AdminSettings {
 			)
 		);
 
+		register_setting(
+			'socialauth_general',
+			'socialauth_dashboard_widget',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'default'           => true,
+			)
+		);
+
 		// Google provider settings.
 		register_setting(
 			'socialauth_google_settings',

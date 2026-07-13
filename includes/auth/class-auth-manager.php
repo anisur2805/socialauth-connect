@@ -171,8 +171,11 @@ class AuthManager {
 		// Audit log.
 		DbManager::log( $wp_user->ID, $provider_id, 'login' );
 
-		// Redirect with validation and shortcode redirect support.
-		$redirect = admin_url();
+		// Redirect: use saved option, fall back to admin dashboard.
+		$redirect = get_option( 'socialauth_login_redirect', '' );
+		if ( empty( $redirect ) || ! wp_validate_redirect( $redirect, false ) ) {
+			$redirect = admin_url();
+		}
 
 		// Support shortcode redirect attribute.
 		if ( ! empty( $_GET['socialauth_redirect'] ) ) {

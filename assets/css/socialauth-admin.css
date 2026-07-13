@@ -173,3 +173,57 @@
     color: #0c5460;
     border: 1px solid #bee5eb;
 }
+
+/* ── Dashboard Widget ──────────────────────────────────────────────── */
+.socialauth-dashboard-linked {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+}
+
+.socialauth-dashboard-linked li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.socialauth-dashboard-linked li:last-child {
+    border-bottom: none;
+}
+
+.socialauth-dashboard-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.socialauth-dashboard-avatar--fallback {
+    width: 20px;
+    height: 20px;
+    border-radius: 0;
+}
+
+.socialauth-dashboard-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.socialauth-dashboard-name {
+    font-weight: 600;
+}
+
+.socialauth-dashboard-email {
+    color: #646970;
+    font-size: 12px;
+}
+
+.socialauth-dashboard-logout {
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f1;
+}

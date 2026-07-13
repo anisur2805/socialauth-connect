@@ -6,6 +6,7 @@ use SocialAuth\Auth\AuthManager;
 use SocialAuth\Admin\AdminMenu;
 use SocialAuth\Admin\AdminSettings;
 use SocialAuth\Admin\AdminNotices;
+use SocialAuth\Admin\DashboardWidget;
 use SocialAuth\Frontend\LoginButtons;
 use SocialAuth\Frontend\Shortcode;
 use SocialAuth\Frontend\Block;
@@ -56,10 +57,12 @@ class Core {
 			$admin_menu     = new AdminMenu();
 			$admin_settings = new AdminSettings();
 			$admin_notices  = new AdminNotices();
+			$dashboard      = new DashboardWidget();
 
 			$admin_menu->register_hooks();
 			$admin_settings->register_hooks();
 			$admin_notices->register_hooks();
+			$dashboard->register_hooks();
 		}
 
 		// Frontend.
