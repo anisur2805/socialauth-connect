@@ -2,6 +2,7 @@
 namespace SocialAuth\Providers;
 
 use SocialAuth\Abstracts\AbstractOAuth2Provider;
+use SocialAuth\Auth\StateManager;
 use SocialAuth\Helpers\HttpClient;
 
 class Facebook extends AbstractOAuth2Provider {
@@ -11,9 +12,29 @@ class Facebook extends AbstractOAuth2Provider {
 	protected string $userinfo_url = 'https://graph.facebook.com/v18.0/me';
 
 	protected array $scopes = array(
-		'email',
 		'public_profile',
 	);
+
+	/**
+	 * Override to use comma-separated scopes (Facebook requirement)
+	 * and omit unsupported parameters like access_type.
+	 */
+	public function get_auth_url(): string {
+		$state = StateManager::generate( $this->get_id() );
+
+		$params = array(
+			'client_id'     => $this->client_id,
+			'redirect_uri'  => $this->redirect_uri,
+			'response_type' => 'code',
+			'state'         => $state,
+		);
+
+		if ( ! empty( $this->scopes ) ) {
+			$params['scope'] = implode( ',', $this->scopes );
+		}
+
+		return $this->auth_url . '?' . http_build_query( $params, '', '&', PHP_QUERY_RFC3986 );
+	}
 
 	public function get_id(): string {
 		return 'facebook';
@@ -30,7 +51,7 @@ class Facebook extends AbstractOAuth2Provider {
 		$response = HttpClient::get(
 			$this->userinfo_url,
 			array(
-				'fields' => 'id,email,name,first_name,last_name,picture.width(200)',
+				'fields' => 'id,name,first_name,last_name,picture.width(200)',
 			),
 			array( 'Authorization' => 'Bearer ' . $access_token )
 		);
@@ -59,7 +80,7 @@ class Facebook extends AbstractOAuth2Provider {
 			'first_name'  => sanitize_text_field( $raw['first_name'] ?? '' ),
 			'last_name'   => sanitize_text_field( $raw['last_name'] ?? '' ),
 			'avatar_url'  => $avatar_url,
-			'verified'    => true, // Facebook requires email verification for OAuth
+			'verified'    => ! empty( $raw['email'] ),
 			'locale'      => '',
 		);
 	}
