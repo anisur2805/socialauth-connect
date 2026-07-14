@@ -12,6 +12,8 @@ use SocialAuth\Frontend\Shortcode;
 use SocialAuth\Frontend\Block;
 use SocialAuth\Providers\Google;
 use SocialAuth\Providers\Facebook;
+use SocialAuth\Providers\XProvider;
+use SocialAuth\Providers\GitHub;
 
 class Core {
 
@@ -35,6 +37,8 @@ class Core {
 	private function register_providers(): void {
 		$this->providers['google']   = new Google();
 		$this->providers['facebook'] = new Facebook();
+		$this->providers['x']        = new XProvider();
+		$this->providers['github']   = new GitHub();
 
 		/**
 		 * Filter: register additional providers.

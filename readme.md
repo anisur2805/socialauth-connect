@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
-One-click social login for WordPress. Let users sign in with Google or Facebook — no passwords required.
+One-click social login for WordPress. Let users sign in with Google, Facebook, X (Twitter), or GitHub — no passwords required.
 
 == Description ==
 
@@ -26,6 +26,8 @@ One-click social login for WordPress. Let users sign in with Google or Facebook 
 
 * **Google** — OAuth 2.0 + OpenID Connect. Supports email verification, profile data, and avatar retrieval.
 * **Facebook** — OAuth 2.0. Supports login with name and profile picture. Email permission available after Facebook App Review.
+* **X (Twitter)** — OAuth 2.0 with PKCE. Supports login with name, username, and profile picture.
+* **GitHub** — OAuth 2.0. Supports login with name, username, email, and avatar.
 
 = Key Features =
 
@@ -150,11 +152,69 @@ One-click social login for WordPress. Let users sign in with Google or Facebook 
 * Facebook requires **HTTPS** for all production sites
 * Do **not** use "Facebook Login for Business" — use the standard **Facebook Login** product
 
+= X (Twitter) OAuth Setup =
+
+**Step 1: Create a Developer Account and App**
+
+1. Go to [X Developer Portal](https://developer.x.com/en/portal/dashboard)
+2. Sign up for a developer account if you don't have one
+3. Create a new app in the dashboard
+
+**Step 2: Configure OAuth 2.0**
+
+1. In your app settings, go to **User authentication settings**
+2. Enable **OAuth 2.0**
+3. Set **Type of App** to **Web App, Automated App or Bot**
+4. Add this URL to **Callback URI / Redirect URL**:
+   ```
+   https://yoursite.com/?socialauth_provider=x&socialauth_action=callback
+   ```
+5. Save changes
+
+**Step 3: Configure the Plugin**
+
+1. Copy the **Client ID** and **Client Secret** from your app settings
+2. In WordPress, go to **Settings → SocialAuth → X (Twitter)** tab
+3. Paste your Client ID and Client Secret
+4. Check **Enable X Login** and save
+
+= Important X/Twitter Notes =
+
+* X uses **OAuth 2.0 with PKCE** — no additional configuration needed, the plugin handles it automatically
+* X does not always provide email addresses — users can still log in with name and profile picture
+* The **Callback URI** must match exactly (including `https://` and query parameters)
+
+= GitHub OAuth Setup =
+
+**Step 1: Create an OAuth App**
+
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Click **OAuth Apps** → **New OAuth App**
+3. Enter an **Application name** (e.g., your site name)
+4. Add this URL to **Authorization callback URL**:
+   ```
+   https://yoursite.com/?socialauth_provider=github&socialauth_action=callback
+   ```
+5. Click **Register application**
+
+**Step 2: Configure the Plugin**
+
+1. Copy the **Client ID** from the app page
+2. Click **Generate a new client secret** and copy it
+3. In WordPress, go to **Settings → SocialAuth → GitHub** tab
+4. Paste your Client ID and Client Secret
+5. Check **Enable GitHub Login** and save
+
+= Important GitHub Notes =
+
+* GitHub may not return email addresses if the user has their email set to private — users can still log in with name and avatar
+* The **Callback URL** must match exactly (including protocol and query parameters)
+
 == Frequently Asked Questions ==
 
 = How long does setup take? =
 
-Google: About 5 minutes. Facebook: About 10–15 minutes (including app creation and publishing).
+Google: About 5 minutes. Facebook: About 10–15 minutes (including app creation and publishing). X: About 5 minutes. GitHub: About 3 minutes.
 
 = Do I need to know how to code? =
 
@@ -193,12 +253,13 @@ Yes. The plugin automatically injects social login buttons on WooCommerce login 
 Yes. Use `[socialauth_login]` to place login buttons anywhere on your site:
 * `[socialauth_login]` — All enabled providers
 * `[socialauth_login providers="google"]` — Google only
-* `[socialauth_login providers="facebook" redirect="/dashboard"]` — With redirect
+* `[socialauth_login providers="facebook,x"]` — Facebook and X only
+* `[socialauth_login providers="github" redirect="/dashboard"]` — With redirect
 * `[socialauth_login show_label="false"]` — Icon only, no text
 
 = Does the plugin collect or store passwords? =
 
-No. Authentication happens entirely through OAuth 2.0 with Google or Facebook. The plugin never sees, handles, or stores user passwords.
+No. Authentication happens entirely through OAuth 2.0 with Google, Facebook, X, or GitHub. The plugin never sees, handles, or stores user passwords.
 
 = Can I add more providers? =
 
@@ -213,6 +274,12 @@ Yes. The plugin uses a modular provider architecture. Developers can add new pro
 5. Test connection success dialog
 
 == Changelog ==
+
+= 1.1.0 =
+* X (Twitter) OAuth 2.0 with PKCE authentication
+* GitHub OAuth 2.0 authentication
+* Setup wizards for X and GitHub providers
+* X logo and GitHub logo assets
 
 = 1.0.0 =
 * Initial release
@@ -234,6 +301,9 @@ Yes. The plugin uses a modular provider architecture. Developers can add new pro
 * Placeholder email for users without Facebook email permission
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds X (Twitter) and GitHub social login providers.
 
 = 1.0.0 =
 Initial release with Google and Facebook social login support.

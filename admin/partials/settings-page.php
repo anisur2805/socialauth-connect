@@ -25,6 +25,14 @@ $active_tab = $active_tab ?? 'general';
            class="nav-tab <?php echo 'facebook' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Facebook', 'socialauth-connect' ); ?>
         </a>
+        <a href="?page=socialauth-connect&tab=x"
+           class="nav-tab <?php echo 'x' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e( 'X (Twitter)', 'socialauth-connect' ); ?>
+        </a>
+        <a href="?page=socialauth-connect&tab=github"
+           class="nav-tab <?php echo 'github' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e( 'GitHub', 'socialauth-connect' ); ?>
+        </a>
     </nav>
 
     <div class="tab-content" style="margin-top: 20px;">
@@ -106,6 +114,107 @@ $active_tab = $active_tab ?? 'general';
                     </button>
                     <div id="socialauth-test-result" class="socialauth-test-result"></div>
                 </div>
+                <?php submit_button(); ?>
+            </form>
+        <?php elseif ( 'x' === $active_tab ) : ?>
+            <?php
+            $x_redirect = esc_url(
+                add_query_arg(
+                    array(
+                        'socialauth_provider' => 'x',
+                        'socialauth_action'   => 'callback',
+                    ),
+                    site_url( '/' )
+                )
+            );
+            ?>
+            <div class="socialauth-wizard">
+                <h3><?php esc_html_e( 'X (Twitter) App Setup Guide', 'socialauth-connect' ); ?></h3>
+                <p class="socialauth-wizard-desc">
+                    <?php esc_html_e( 'Follow these steps to configure your X/Twitter app for login:', 'socialauth-connect' ); ?>
+                </p>
+                <ol class="socialauth-wizard-steps">
+                    <li>
+                        <?php esc_html_e( 'Go to', 'socialauth-connect' ); ?>
+                        <a href="https://developer.x.com/en/portal/dashboard" target="_blank" rel="noopener"><?php esc_html_e( 'X Developer Portal', 'socialauth-connect' ); ?></a>
+                        <?php esc_html_e( 'and create a new app.', 'socialauth-connect' ); ?>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'In app settings, go to "User authentication settings" and enable OAuth 2.0.', 'socialauth-connect' ); ?>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'Copy the Client ID and Client Secret into the fields below.', 'socialauth-connect' ); ?>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'Add this URL to "Callback URI / Redirect URL":', 'socialauth-connect' ); ?>
+                        <div class="socialauth-copy-field">
+                            <code id="socialauth-x-redirect"><?php echo esc_html( $x_redirect ); ?></code>
+                            <button type="button" class="socialauth-copy-btn" data-copy-target="socialauth-x-redirect"><?php esc_html_e( 'Copy', 'socialauth-connect' ); ?></button>
+                        </div>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'Click "Test Connection" to verify your credentials work, then Save Changes.', 'socialauth-connect' ); ?>
+                    </li>
+                </ol>
+            </div>
+
+            <form method="post" action="options.php">
+                <?php
+                settings_fields( 'socialauth_x_settings' );
+                do_settings_sections( 'socialauth-x' );
+                ?>
+                <div class="socialauth-test-section">
+                    <button type="button" id="socialauth-test-x-connection" class="button button-secondary">
+                        <?php esc_html_e( 'Test Connection', 'socialauth-connect' ); ?>
+                    </button>
+                    <div id="socialauth-test-x-result" class="socialauth-test-result"></div>
+                </div>
+                <?php submit_button(); ?>
+            </form>
+        <?php elseif ( 'github' === $active_tab ) : ?>
+            <?php
+            $github_redirect = esc_url(
+                add_query_arg(
+                    array(
+                        'socialauth_provider' => 'github',
+                        'socialauth_action'   => 'callback',
+                    ),
+                    site_url( '/' )
+                )
+            );
+            ?>
+            <div class="socialauth-wizard">
+                <h3><?php esc_html_e( 'GitHub App Setup Guide', 'socialauth-connect' ); ?></h3>
+                <p class="socialauth-wizard-desc">
+                    <?php esc_html_e( 'Follow these steps to configure your GitHub OAuth App for login:', 'socialauth-connect' ); ?>
+                </p>
+                <ol class="socialauth-wizard-steps">
+                    <li>
+                        <?php esc_html_e( 'Go to', 'socialauth-connect' ); ?>
+                        <a href="https://github.com/settings/developers" target="_blank" rel="noopener"><?php esc_html_e( 'GitHub Developer Settings', 'socialauth-connect' ); ?></a>
+                        <?php esc_html_e( '→ OAuth Apps → New OAuth App.', 'socialauth-connect' ); ?>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'Enter an Application name (e.g., your site name).', 'socialauth-connect' ); ?>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'Add this URL to "Authorization callback URL":', 'socialauth-connect' ); ?>
+                        <div class="socialauth-copy-field">
+                            <code id="socialauth-github-redirect"><?php echo esc_html( $github_redirect ); ?></code>
+                            <button type="button" class="socialauth-copy-btn" data-copy-target="socialauth-github-redirect"><?php esc_html_e( 'Copy', 'socialauth-connect' ); ?></button>
+                        </div>
+                    </li>
+                    <li>
+                        <?php esc_html_e( 'Copy the Client ID and Client Secret into the fields below.', 'socialauth-connect' ); ?>
+                    </li>
+                </ol>
+            </div>
+
+            <form method="post" action="options.php">
+                <?php
+                settings_fields( 'socialauth_github_settings' );
+                do_settings_sections( 'socialauth-github' );
+                ?>
                 <?php submit_button(); ?>
             </form>
         <?php else : ?>
